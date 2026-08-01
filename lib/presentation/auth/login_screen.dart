@@ -116,7 +116,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('Đăng nhập', style: Theme.of(context).textTheme.headlineSmall),
+                          Text('Đăng nhập',
+                              style: Theme.of(context).textTheme.headlineSmall),
                           const SizedBox(height: 4),
                           const Text('Chào mừng chủ trọ quay trở lại 👋',
                               style: TextStyle(color: AppColors.textSecondary)),
@@ -141,12 +142,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 icon: Icon(_obscure
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined),
-                                onPressed: () => setState(() => _obscure = !_obscure),
+                                onPressed: () =>
+                                    setState(() => _obscure = !_obscure),
                               ),
                             ),
                             obscureText: _obscure,
-                            validator: (v) =>
-                                (v == null || v.isEmpty) ? 'Nhập mật khẩu' : null,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? 'Nhập mật khẩu'
+                                : null,
                           ),
                           const SizedBox(height: 22),
                           ElevatedButton(
@@ -163,35 +166,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 8),
                           TextButton(
                             onPressed: () => context.push('/signup'),
-                            child: const Text('Chưa có tài khoản? Đăng ký ngay'),
+                            child:
+                                const Text('Chưa có tài khoản? Đăng ký ngay'),
                           ),
                           const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: AppColors.infoSoft,
-                              borderRadius: BorderRadius.circular(AppRadius.sm),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(Icons.info_outline, size: 18, color: AppColors.info),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: RichText(
-                                    text: const TextSpan(
-                                      style: TextStyle(fontSize: 12.5, color: AppColors.textPrimary, height: 1.4),
-                                      children: [
-                                        TextSpan(text: 'Tài khoản demo: ', style: TextStyle(fontWeight: FontWeight.w700)),
-                                        TextSpan(text: 'admin@motel.com / 123456\n'),
-                                        TextSpan(text: 'Đang dùng xác thực giả lập cục bộ theo đúng hình dạng Firebase Authentication.'),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Container(
+                          //   padding: const EdgeInsets.all(14),
+                          //   decoration: BoxDecoration(
+                          //     color: AppColors.infoSoft,
+                          //     borderRadius: BorderRadius.circular(AppRadius.sm),
+                          //   ),
+                          //   child: Row(
+                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                          //     children: [
+                          //       const Icon(Icons.info_outline, size: 18, color: AppColors.info),
+                          //       const SizedBox(width: 10),
+                          //       Expanded(
+                          //         child: RichText(
+                          //           text: const TextSpan(
+                          //             style: TextStyle(fontSize: 12.5, color: AppColors.textPrimary, height: 1.4),
+                          //             children: [
+                          //               TextSpan(text: 'Tài khoản demo: ', style: TextStyle(fontWeight: FontWeight.w700)),
+                          //               TextSpan(text: 'admin@motel.com / 123456\n'),
+                          //               TextSpan(text: 'Đang dùng xác thực giả lập cục bộ theo đúng hình dạng Firebase Authentication.'),
+                          //             ],
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

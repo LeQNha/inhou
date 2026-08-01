@@ -1,9 +1,9 @@
 import '../entities/owner.dart';
 
-/// Interface viết theo "hình dạng" của Firebase Authentication
-/// (signIn/signUp/signOut/currentUser/authStateChanges) dù hiện tại bên
-/// dưới chỉ là mock local. Khi có Firebase project thật, chỉ cần viết
-/// AuthRepositoryFirebase implements AuthRepository, không cần sửa UI.
+/// Interface xác thực (đăng nhập/đăng ký/đăng xuất), tách khỏi phần cài
+/// đặt cụ thể theo đúng Repository Pattern dùng chung cho cả app. Hiện
+/// tại được cài đặt bởi AuthRepositorySqlite (lưu tài khoản trực tiếp
+/// trong SQLite cùng database với dữ liệu nghiệp vụ).
 abstract class AuthRepository {
   Stream<Owner?> authStateChanges();
 

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/auth/auth_repository_mock_firebase.dart';
+import '../../data/sqlite/auth_repository_sqlite.dart';
 import '../../data/sqlite/database_helper.dart';
 import '../../data/sqlite/floor_repository_sqlite.dart';
 import '../../data/sqlite/invoice_repository_sqlite.dart';
@@ -19,19 +19,12 @@ import '../../domain/repositories/room_repository.dart';
 import '../../domain/repositories/room_type_repository.dart';
 import '../../domain/repositories/tenant_repository.dart';
 
-// ---------------------------------------------------------------------------
-// ĐÂY LÀ NƠI DUY NHẤT CẦN SỬA KHI MUỐN CHUYỂN SANG FIREBASE.
-// Ví dụ: authRepositoryProvider = Provider((ref) => AuthRepositoryFirebase());
-//        motelRepositoryProvider = Provider((ref) => MotelRepositoryFirestore());
-// Toàn bộ UI/state phía dưới chỉ phụ thuộc vào abstract class, không đổi gì.
-// ---------------------------------------------------------------------------
-
 final databaseHelperProvider = Provider<DatabaseHelper>((ref) {
   return DatabaseHelper.instance;
 });
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepositoryMockFirebase();
+  return AuthRepositorySqlite(ref.watch(databaseHelperProvider));
 });
 
 final motelRepositoryProvider = Provider<MotelRepository>((ref) {
@@ -61,11 +54,6 @@ final meterReadingRepositoryProvider = Provider<MeterReadingRepository>((ref) {
 final invoiceRepositoryProvider = Provider<InvoiceRepository>((ref) {
   return InvoiceRepositorySqlite(ref.watch(databaseHelperProvider));
 });
-
-// ---------------------------------------------------------------------------
-// Auth state - lắng nghe authStateChanges() giống hệt cách dùng
-// FirebaseAuth.instance.authStateChanges() trong thực tế.
-// ---------------------------------------------------------------------------
 
 final authStateProvider = StreamProvider<Owner?>((ref) {
   final repo = ref.watch(authRepositoryProvider);

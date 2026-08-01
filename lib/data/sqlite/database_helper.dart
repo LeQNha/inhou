@@ -2,14 +2,13 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// Toàn bộ dữ liệu nghiệp vụ (Motel -> Floor -> RoomType -> Room -> Tenant
-/// -> MeterReading -> Invoice -> Payment) được lưu ở SQLite.
+/// -> MeterReading -> Invoice -> Payment) được lưu ở SQLite, cùng chung 1
+/// database với bảng `owners` (tài khoản đăng nhập cục bộ).
 ///
-/// Lưu ý thiết kế để dễ migrate Firestore sau này:
+/// Lưu ý thiết kế:
 /// - Mọi khóa chính đều là TEXT (UUID), không dùng AUTOINCREMENT.
-/// - Ngày giờ lưu dạng TEXT ISO8601 (tương đương độ chính xác Timestamp).
-/// - Không có bảng "owners" ở đây vì thông tin đăng nhập được quản lý bởi
-///   AuthRepository (hiện là mock, sau này là Firebase Auth) - tách biệt
-///   hoàn toàn khỏi dữ liệu nghiệp vụ.
+/// - Ngày giờ lưu dạng TEXT ISO8601.
+/// - Bảng `owners` lưu mật khẩu dạng đã băm (SHA-256), không lưu plaintext.
 class DatabaseHelper {
   DatabaseHelper._internal();
   static final DatabaseHelper instance = DatabaseHelper._internal();
@@ -26,9 +25,19 @@ class DatabaseHelper {
     final path = join(dbPath, 'smart_motel_manager.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
       onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE owners (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            display_name TEXT NOT NULL,
+            password_hash TEXT NOT NULL
+          )
+        ''');
+        await _seedDemoOwner(db);
+
         await db.execute('''
           CREATE TABLE motels (
             id TEXT PRIMARY KEY,
@@ -140,6 +149,38 @@ class DatabaseHelper {
           )
         ''');
       },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // Nâng cấp từ bản trước (chưa có bảng owners) -> thêm bảng owners
+        // mà KHÔNG đụng tới dữ liệu nhà trọ/phòng/hóa đơn đã có sẵn.
+        if (oldVersion < 2) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS owners (
+              id TEXT PRIMARY KEY,
+              email TEXT UNIQUE NOT NULL,
+              display_name TEXT NOT NULL,
+              password_hash TEXT NOT NULL
+            )
+          ''');
+          await _seedDemoOwner(db);
+        }
+      },
+    );
+  }
+
+  /// Tài khoản demo có sẵn: admin@motel.com / 123456
+  /// (hash SHA-256 của "123456" được tính sẵn, không hash lúc chạy để
+  /// tránh phải import package crypto ngay trong migration).
+  Future<void> _seedDemoOwner(DatabaseExecutor db) async {
+    await db.insert(
+      'owners',
+      {
+        'id': 'demo-owner-id',
+        'email': 'admin@motel.com',
+        'display_name': 'Chủ trọ Demo',
+        'password_hash':
+            '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 
@@ -162,7 +203,14 @@ class DatabaseHelper {
     });
   }
 
+  // Lưu ý: KHÔNG đưa 'owners' vào wipeAllData() ở trên, vì khôi phục dữ
+  // liệu nhà trọ không nên xóa mất tài khoản đăng nhập hiện tại. Bảng
+  // owners vẫn được export/import đầy đủ trong exportAll()/importAll()
+  // bên dưới để 1 file backup có thể khôi phục TOÀN BỘ (kể cả tài khoản)
+  // trên một thiết bị mới.
+
   static const _backupTables = [
+    'owners',
     'motels',
     'floors',
     'room_types',
@@ -173,7 +221,10 @@ class DatabaseHelper {
     'payments',
   ];
 
-  /// Xuất toàn bộ dữ liệu nghiệp vụ ra Map (sẽ được encode JSON ở tầng trên).
+  /// Xuất toàn bộ dữ liệu (kể cả tài khoản đăng nhập) ra Map, encode JSON
+  /// ở tầng trên. Nhờ vậy 1 file backup duy nhất là đủ để khôi phục toàn
+  /// bộ ứng dụng trên thiết bị khác — không cần thêm cơ chế nào khác cho
+  /// riêng phần tài khoản.
   Future<Map<String, dynamic>> exportAll() async {
     final db = await database;
     final data = <String, dynamic>{};
@@ -183,15 +234,21 @@ class DatabaseHelper {
     return data;
   }
 
-  /// Xóa dữ liệu hiện tại và nạp lại toàn bộ từ file backup.
+  /// Xóa dữ liệu hiện tại và nạp lại toàn bộ từ file backup (kể cả owners).
   Future<void> importAll(Map<String, dynamic> data) async {
     final db = await database;
-    await wipeAllData();
     await db.transaction((txn) async {
+      for (final table in _backupTables.reversed) {
+        await txn.delete(table);
+      }
       for (final table in _backupTables) {
         final rows = (data[table] as List?) ?? [];
         for (final row in rows) {
-          await txn.insert(table, Map<String, dynamic>.from(row as Map));
+          await txn.insert(
+            table,
+            Map<String, dynamic>.from(row as Map),
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
         }
       }
     });
