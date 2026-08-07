@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 class AppColors {
   AppColors._();
 
+  // static const primary = Color(0xFF4F46E5); // Indigo
   static const primary = Color(0xFF4F46E5); // Indigo
   static const primaryDark = Color(0xFF4338CA);
   static const secondary = Color(0xFF7C3AED); // Violet - dùng cho gradient
