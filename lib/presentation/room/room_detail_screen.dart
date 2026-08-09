@@ -24,6 +24,7 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
   Tenant? _tenant;
   List<RoomType> _roomTypes = [];
   bool _loading = true;
+  String? _monthKey;
 
   @override
   void initState() {
@@ -44,7 +45,9 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
       final motels =
           await ref.read(motelRepositoryProvider).getMotelsByOwner(owner.id);
       final motelId = ref.read(selectedMotelIdProvider) ?? motels.first.id;
-      types = await ref.read(roomTypeRepositoryProvider).getRoomTypesByMotel(motelId);
+      types = await ref
+          .read(roomTypeRepositoryProvider)
+          .getRoomTypesByMotel(motelId);
     }
 
     if (!mounted) return;
@@ -60,27 +63,31 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
     final room = _detail!.room;
     if (room.status == RoomStatus.trong && _tenant == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Vui lòng thêm thông tin người thuê trước khi đổi trạng thái.'),
+        content: Text(
+            'Vui lòng thêm thông tin người thuê trước khi đổi trạng thái.'),
       ));
       return;
     }
-    final newStatus =
-        room.status == RoomStatus.trong ? RoomStatus.dangThue : RoomStatus.trong;
-    await ref.read(roomRepositoryProvider).updateRoom(room.copyWith(status: newStatus));
+    final newStatus = room.status == RoomStatus.trong
+        ? RoomStatus.dangThue
+        : RoomStatus.trong;
+    await ref
+        .read(roomRepositoryProvider)
+        .updateRoom(room.copyWith(status: newStatus));
     _load();
   }
 
   Future<void> _editOverride() async {
     final detail = _detail!;
     final room = detail.room;
-    final roomPriceCtrl =
-        TextEditingController(text: room.customRoomPrice?.toStringAsFixed(0) ?? '');
+    final roomPriceCtrl = TextEditingController(
+        text: room.customRoomPrice?.toStringAsFixed(0) ?? '');
     final areaCtrl =
         TextEditingController(text: room.customArea?.toStringAsFixed(0) ?? '');
     final electricCtrl = TextEditingController(
         text: room.customElectricPrice?.toStringAsFixed(0) ?? '');
-    final waterCtrl =
-        TextEditingController(text: room.customWaterPrice?.toStringAsFixed(0) ?? '');
+    final waterCtrl = TextEditingController(
+        text: room.customWaterPrice?.toStringAsFixed(0) ?? '');
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
@@ -89,7 +96,8 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
       builder: (ctx) => Container(
         decoration: const BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+          borderRadius:
+              BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
         ),
         padding: EdgeInsets.only(
           left: 20,
@@ -107,14 +115,17 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
                   width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
-                  decoration:
-                      BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(2)),
+                  decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(2)),
                 ),
               ),
-              Text('Ghi đè giá riêng cho phòng này', style: Theme.of(context).textTheme.titleLarge),
+              Text('Ghi đè giá riêng cho phòng này',
+                  style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 4),
               Text('Để trống = dùng theo loại phòng "${detail.roomTypeName}"',
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                  style: const TextStyle(
+                      color: AppColors.textSecondary, fontSize: 12)),
               const SizedBox(height: 18),
               TextField(
                 controller: roomPriceCtrl,
@@ -128,7 +139,8 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
                 controller: areaCtrl,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                    labelText: 'Diện tích riêng (mặc định ${detail.area.toStringAsFixed(0)}m²)'),
+                    labelText:
+                        'Diện tích riêng (mặc định ${detail.area.toStringAsFixed(0)}m²)'),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -161,7 +173,8 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
     );
 
     if (saved != true) return;
-    double? parse(String s) => s.trim().isEmpty ? null : double.tryParse(s.trim());
+    double? parse(String s) =>
+        s.trim().isEmpty ? null : double.tryParse(s.trim());
 
     final updated = room.copyWith(
       customRoomPrice: () => parse(roomPriceCtrl.text),
@@ -178,7 +191,8 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
     final selected = await showDialog<RoomType>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md)),
         title: const Text('Chọn loại phòng'),
         children: _roomTypes
             .map((rt) => SimpleDialogOption(
@@ -206,7 +220,8 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
     final detail = _detail!;
     final room = detail.room;
     final isOccupied = room.status == RoomStatus.dangThue;
-    final statusColor = isOccupied ? AppColors.roomOccupied : AppColors.roomEmpty;
+    final statusColor =
+        isOccupied ? AppColors.roomOccupied : AppColors.roomEmpty;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -233,16 +248,21 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
                       children: [
                         Text('Phòng ${room.roomNumber}',
                             style: const TextStyle(
-                                color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800)),
                         const SizedBox(height: 6),
                         GestureDetector(
                           onTap: _changeRoomType,
                           child: Row(
                             children: [
                               Text('Loại: ${detail.roomTypeName}',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13)),
+                                  style: TextStyle(
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 13)),
                               const SizedBox(width: 4),
-                              const Icon(Icons.edit, size: 12, color: Colors.white70),
+                              const Icon(Icons.edit,
+                                  size: 12, color: Colors.white70),
                             ],
                           ),
                         ),
@@ -252,7 +272,8 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
                   StatusBadge(
                     label: room.status.label,
                     color: Colors.white,
-                    icon: isOccupied ? Icons.person : Icons.check_circle_outline,
+                    icon:
+                        isOccupied ? Icons.person : Icons.check_circle_outline,
                   ),
                 ],
               ),
@@ -264,16 +285,22 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
               title: 'Thông tin & giá',
               child: Column(
                 children: [
-                  _InfoRow(Icons.square_foot, 'Diện tích', '${detail.area.toStringAsFixed(0)} m²',
+                  _InfoRow(Icons.square_foot, 'Diện tích',
+                      '${detail.area.toStringAsFixed(0)} m²',
                       overridden: room.customArea != null),
-                  _InfoRow(Icons.home_outlined, 'Giá phòng', AppFormatters.currency(detail.roomPrice),
+                  _InfoRow(Icons.home_outlined, 'Giá phòng',
+                      AppFormatters.currency(detail.roomPrice),
                       overridden: room.customRoomPrice != null),
-                  _InfoRow(Icons.bolt_outlined, 'Giá điện', '${AppFormatters.currency(detail.electricPrice)}/kWh',
+                  _InfoRow(Icons.bolt_outlined, 'Giá điện',
+                      '${AppFormatters.currency(detail.electricPrice)}/kWh',
                       overridden: room.customElectricPrice != null),
-                  _InfoRow(Icons.water_drop_outlined, 'Giá nước', '${AppFormatters.currency(detail.waterPrice)}/m³',
+                  _InfoRow(Icons.water_drop_outlined, 'Giá nước',
+                      '${AppFormatters.currency(detail.waterPrice)}/m³',
                       overridden: room.customWaterPrice != null),
-                  _InfoRow(Icons.wifi, 'Internet', '${AppFormatters.currency(detail.internetPrice)}/tháng'),
-                  _InfoRow(Icons.delete_outline, 'Tiền rác', '${AppFormatters.currency(detail.garbagePrice)}/tháng'),
+                  _InfoRow(Icons.wifi, 'Internet',
+                      '${AppFormatters.currency(detail.internetPrice)}/tháng'),
+                  _InfoRow(Icons.delete_outline, 'Tiền rác',
+                      '${AppFormatters.currency(detail.garbagePrice)}/tháng'),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
@@ -299,23 +326,31 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
                 label: Text(_tenant == null ? 'Thêm' : 'Sửa'),
               ),
               child: _tenant == null
-                  ? const Text('Chưa có người thuê', style: TextStyle(color: AppColors.textSecondary))
+                  ? const Text('Chưa có người thuê',
+                      style: TextStyle(color: AppColors.textSecondary))
                   : Column(
                       children: [
-                        _InfoRow(Icons.person_outline, 'Họ tên', _tenant!.fullName),
+                        _InfoRow(
+                            Icons.person_outline, 'Họ tên', _tenant!.fullName),
                         _InfoRow(Icons.credit_card, 'CCCD', _tenant!.cccd),
                         _InfoRow(Icons.phone_outlined, 'SĐT', _tenant!.phone),
-                        _InfoRow(Icons.event_outlined, 'Ngày dọn vào', AppFormatters.date(_tenant!.moveInDate)),
-                        _InfoRow(Icons.savings_outlined, 'Tiền cọc', AppFormatters.currency(_tenant!.deposit)),
+                        _InfoRow(Icons.event_outlined, 'Ngày dọn vào',
+                            AppFormatters.date(_tenant!.moveInDate)),
+                        _InfoRow(Icons.savings_outlined, 'Tiền cọc',
+                            AppFormatters.currency(_tenant!.deposit)),
                       ],
                     ),
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: _toggleStatus,
-              style: OutlinedButton.styleFrom(foregroundColor: statusColor, side: BorderSide(color: statusColor.withOpacity(0.4))),
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: statusColor,
+                  side: BorderSide(color: statusColor.withOpacity(0.4))),
               icon: Icon(isOccupied ? Icons.logout : Icons.login),
-              label: Text(isOccupied ? 'Đánh dấu phòng Trống (khách trả phòng)' : 'Đánh dấu Đang thuê'),
+              label: Text(isOccupied
+                  ? 'Đánh dấu phòng Trống (khách trả phòng)'
+                  : 'Đánh dấu Đang thuê'),
             ),
             const SizedBox(height: 22),
             const Text('Thao tác nhanh',
@@ -342,6 +377,7 @@ class _RoomDetailScreenState extends ConsumerState<RoomDetailScreen> {
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
+  // value is a string representation of the value to display
   final String value;
   final bool overridden;
   const _InfoRow(this.icon, this.label, this.value, {this.overridden = false});
@@ -355,9 +391,13 @@ class _InfoRow extends StatelessWidget {
           Icon(icon, size: 16, color: AppColors.textSecondary),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13.5)),
+            child: Text(label,
+                style: const TextStyle(
+                    color: AppColors.textSecondary, fontSize: 13.5)),
           ),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+          Text(value,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
           if (overridden) ...[
             const SizedBox(width: 6),
             const Tooltip(

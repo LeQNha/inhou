@@ -70,6 +70,7 @@ class _InvoiceListScreenState extends ConsumerState<InvoiceListScreen> {
       helpText: 'Chọn tháng',
     );
     if (picked == null) return;
+    // setState(() => _monthKey = AppFormatters.monthKey(picked));
     setState(() => _monthKey = AppFormatters.monthKey(picked));
     _load();
   }
