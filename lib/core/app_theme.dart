@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Design system tập trung: màu sắc, gradient, typography, bo góc, đổ bóng.
-/// Toàn bộ app dùng chung các hằng số này để giao diện nhất quán và
-/// chuyên nghiệp, thay vì mỗi màn hình tự chọn màu/khoảng cách riêng.
 class AppColors {
   AppColors._();
 
