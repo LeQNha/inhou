@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Design system tập trung: màu sắc, gradient, typography, bo góc, đổ bóng.
 class AppColors {
   AppColors._();
 
@@ -75,9 +74,6 @@ class AppShadows {
       ];
 }
 
-/// Giữ tên `AppTheme` để tương thích các chỗ đã dùng trước đó
-/// (roomEmpty/roomOccupied/unpaid/paid/primary) nhưng nay chỉ forward
-/// sang AppColors + cung cấp ThemeData chi tiết hơn.
 class AppTheme {
   AppTheme._();
 

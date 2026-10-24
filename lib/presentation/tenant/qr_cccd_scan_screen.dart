@@ -4,19 +4,6 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../core/app_theme.dart';
 
-/// ⭐ WOW #1 - Quét QR CCCD bằng camera thật (package `mobile_scanner`).
-///
-/// Mã QR mặt sau thẻ CCCD gắn chip của Việt Nam mã hóa các trường thông
-/// tin phân cách bởi dấu "|" theo thứ tự:
-///   0: Số CCCD (12 số)
-///   1: Số CMND cũ (có thể rỗng)
-///   2: Họ và tên (viết hoa không dấu)
-///   3: Ngày sinh (ddMMyyyy)
-///   4: Giới tính
-///   5: Địa chỉ thường trú
-///   6: Ngày cấp (ddMMyyyy)
-/// Đây là định dạng công khai do Bộ Công an quy định cho QR trên CCCD,
-/// không phải thông tin riêng tư/bí mật.
 class QrCccdScanScreen extends StatefulWidget {
   final String roomId;
   const QrCccdScanScreen({super.key, required this.roomId});
@@ -46,7 +33,8 @@ class _QrCccdScanScreenState extends State<QrCccdScanScreen> {
 
     final parsed = _parseCccdQr(raw);
     if (parsed == null) {
-      setState(() => _error = 'Mã QR không đúng định dạng CCCD. Vui lòng thử lại.');
+      setState(
+          () => _error = 'Mã QR không đúng định dạng CCCD. Vui lòng thử lại.');
       return;
     }
 
@@ -71,7 +59,8 @@ class _QrCccdScanScreenState extends State<QrCccdScanScreen> {
       final day = d.substring(0, 2);
       final month = d.substring(2, 4);
       final year = d.substring(4, 8);
-      dobIso = DateTime.tryParse('$year-$month-${day}T00:00:00')?.toIso8601String();
+      dobIso =
+          DateTime.tryParse('$year-$month-${day}T00:00:00')?.toIso8601String();
     }
 
     return {
@@ -88,19 +77,23 @@ class _QrCccdScanScreenState extends State<QrCccdScanScreen> {
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md)),
         title: const Text('Nhập chuỗi QR CCCD (demo)'),
         content: TextField(
           controller: ctrl,
           maxLines: 3,
           decoration: const InputDecoration(
-            hintText: '079201012345|001201001234|NGUYEN VAN A|12051998|Nam|...|010120',
+            hintText:
+                '079201012345|001201001234|NGUYEN VAN A|12051998|Nam|...|010120',
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
           FilledButton(
-              onPressed: () => Navigator.pop(ctx, ctrl.text), child: const Text('Dùng chuỗi này')),
+              onPressed: () => Navigator.pop(ctx, ctrl.text),
+              child: const Text('Dùng chuỗi này')),
         ],
       ),
     );
@@ -170,7 +163,8 @@ class _QrCccdScanScreenState extends State<QrCccdScanScreen> {
                       ),
                       child: Text(_error!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white, fontSize: 13)),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 13)),
                     ),
                   ),
               ],

@@ -14,6 +14,7 @@ import '../../domain/entities/invoice.dart';
 import '../../domain/entities/meter_reading.dart';
 import '../../domain/entities/room.dart';
 import '../providers/providers.dart';
+import 'invoice_qr_share_screen.dart';
 import '../widgets/dashed_divider.dart';
 import '../widgets/status_badge.dart';
 
@@ -34,6 +35,14 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
   bool _exporting = false;
 
   final ScreenshotController _screenshotController = ScreenshotController();
+
+  Future<void> _shareInvoiceWithQr() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => InvoiceQrShareScreen(invoice: _invoice!, room: _room!),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -76,8 +85,7 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
     _load();
   }
 
-  /// ⭐ WOW #2 - Chụp Card hóa đơn thành ảnh PNG thật (package `screenshot`)
-  /// và lưu vào thư mục Documents của app.
+  /// Chụp Card hóa đơn thành ảnh PNG thật (package `screenshot`)
   Future<File?> _captureReceiptPng() async {
     final bytes = await _screenshotController.capture(pixelRatio: 3);
     if (bytes == null) return null;
@@ -107,11 +115,7 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
     }
   }
 
-  /// ⭐ WOW #3 - Chia sẻ hóa đơn qua Zalo/Messenger bằng cách mở Share
-  /// Sheet của hệ điều hành (package `share_plus`) kèm ảnh PNG vừa xuất.
-  /// Lưu ý: không có API để gửi thẳng vào Zalo (không public), nhưng
-  /// Share Sheet sẽ liệt kê Zalo/Messenger nếu máy đã cài, người dùng
-  /// chỉ cần chọn app muốn gửi.
+  /// Chia sẻ hóa đơn qua Zalo/Messenger bằng cách mở Share
   Future<void> _shareInvoice() async {
     setState(() => _exporting = true);
     try {
@@ -140,6 +144,14 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
       if (mounted) setState(() => _exporting = false);
     }
   }
+
+  // Future<void> _shareInvoiceWithQr() async {
+  //   await Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (_) => InvoiceQrShareScreen(invoice: _invoice!, room: _room!),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -198,9 +210,15 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
-            onPressed: () => context.push('/invoice/${invoice.id}/vietqr'),
+            onPressed: _exporting ? null : _shareInvoiceWithQr,
             icon: const Icon(Icons.qr_code_2),
-            label: const Text('Tạo mã QR chuyển khoản (VietQR)'),
+            label: const Text('Chia sẻ hóa đơn kèm mã QR'),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () => context.push('/invoice/${invoice.id}/vietqr'),
+            icon: const Icon(Icons.account_balance_outlined),
+            label: const Text('Tạo / chỉnh sửa mã QR VietQR'),
           ),
         ],
       ),
@@ -218,6 +236,16 @@ class _ReceiptCard extends StatelessWidget {
       required this.room,
       required this.reading,
       required this.paid});
+
+  // Future<void> _shareInvoiceWithQr() async {
+  //   await Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (_) => InvoiceQrShareScreen(invoice: _invoice!, room: _room!),
+  //     ),
+  //   );
+  // }
+
+  // _shareInvoiceWithQr(context)
 
   @override
   Widget build(BuildContext context) {

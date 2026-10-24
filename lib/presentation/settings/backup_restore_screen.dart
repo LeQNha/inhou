@@ -10,7 +10,7 @@ import '../../core/app_theme.dart';
 import '../providers/providers.dart';
 import '../widgets/section_card.dart';
 
-/// Sao lưu / khôi phục dữ liệu (tính năng "nên có" để lấy điểm hoàn thiện).
+/// Sao lưu / khôi phục dữ liệu
 ///
 /// Cách hoạt động hiện tại: xuất toàn bộ dữ liệu SQLite ra 1 file JSON lưu
 /// trong thư mục Documents của app (`smart_motel_backup.json`). Khôi phục

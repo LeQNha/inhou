@@ -9,10 +9,6 @@ import '../../domain/entities/motel.dart';
 import '../../domain/entities/room_type.dart';
 import '../providers/providers.dart';
 
-/// Wizard khởi tạo nhà trọ lần đầu: Tên -> Địa chỉ -> Số tầng -> Số phòng/tầng
-/// -> Giá điện/nước mặc định -> Hoàn thành. Sau bước này, Database sẽ tự
-/// sinh cấu trúc Motel -> Floor -> RoomType ("Tiêu chuẩn") -> Room.
-/// Người dùng vẫn có thể thêm/sửa tầng, phòng, loại phòng sau này.
 class SetupWizardScreen extends ConsumerStatefulWidget {
   const SetupWizardScreen({super.key});
 

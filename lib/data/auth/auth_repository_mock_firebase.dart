@@ -9,18 +9,7 @@ import '../../domain/repositories/auth_repository.dart';
 /// signOut / currentUser / authStateChanges / sendPasswordResetEmail),
 /// nhưng bên dưới chỉ lưu tài khoản trong bộ nhớ (RAM), không cần
 /// kết nối Internet hay cấu hình Firebase project.
-///
-/// Có sẵn 1 tài khoản demo để đăng nhập ngay:
-///   email:    admin@motel.com
-///   password: 123456
-///
-/// KHI MUỐN CHUYỂN SANG FIREBASE THẬT:
-/// 1. Thêm package `firebase_auth` + cấu hình FlutterFire.
-/// 2. Viết class AuthRepositoryFirebase implements AuthRepository, gọi
-///    FirebaseAuth.instance cho từng method tương ứng.
-/// 3. Đổi duy nhất 1 dòng trong providers.dart (authRepositoryProvider).
-/// Toàn bộ UI, Riverpod state, và các repository khác giữ nguyên không đổi,
-/// vì chúng chỉ phụ thuộc vào abstract class AuthRepository.
+
 class AuthRepositoryMockFirebase implements AuthRepository {
   AuthRepositoryMockFirebase() {
     _seedDemoAccount();

@@ -4,8 +4,7 @@ import 'package:sqflite/sqflite.dart';
 /// Toàn bộ dữ liệu nghiệp vụ (Motel -> Floor -> RoomType -> Room -> Tenant
 /// -> MeterReading -> Invoice -> Payment) được lưu ở SQLite, cùng chung 1
 /// database với bảng `owners` (tài khoản đăng nhập cục bộ).
-///
-/// Lưu ý thiết kế:
+
 /// - Mọi khóa chính đều là TEXT (UUID), không dùng AUTOINCREMENT.
 /// - Ngày giờ lưu dạng TEXT ISO8601.
 /// - Bảng `owners` lưu mật khẩu dạng đã băm (SHA-256), không lưu plaintext.
